@@ -134,10 +134,7 @@ public class BurgerTest {
      */
     @Test
     public void moveIngredientShouldKeepListSize() {
-        burger.addIngredient(hotSauceIngredient);
-        burger.addIngredient(cutletFillingIngredient);
-        burger.addIngredient(chiliSauceIngredient);
-        burger.moveIngredient(0, 2);
+        prepareBurgerWithThreeIngredientsAndMoveFirstToLast();
         assertEquals(3, burger.ingredients.size());
     }
 
@@ -147,10 +144,7 @@ public class BurgerTest {
      */
     @Test
     public void moveIngredientShouldSetCorrectFirstPosition() {
-        burger.addIngredient(hotSauceIngredient);
-        burger.addIngredient(cutletFillingIngredient);
-        burger.addIngredient(chiliSauceIngredient);
-        burger.moveIngredient(0, 2);
+        prepareBurgerWithThreeIngredientsAndMoveFirstToLast();
         assertSame(cutletFillingIngredient, burger.ingredients.get(0));
     }
 
@@ -160,10 +154,7 @@ public class BurgerTest {
      */
     @Test
     public void moveIngredientShouldSetCorrectSecondPosition() {
-        burger.addIngredient(hotSauceIngredient);
-        burger.addIngredient(cutletFillingIngredient);
-        burger.addIngredient(chiliSauceIngredient);
-        burger.moveIngredient(0, 2);
+        prepareBurgerWithThreeIngredientsAndMoveFirstToLast();
         assertSame(chiliSauceIngredient, burger.ingredients.get(1));
     }
 
@@ -173,10 +164,7 @@ public class BurgerTest {
      */
     @Test
     public void moveIngredientShouldSetCorrectThirdPosition() {
-        burger.addIngredient(hotSauceIngredient);
-        burger.addIngredient(cutletFillingIngredient);
-        burger.addIngredient(chiliSauceIngredient);
-        burger.moveIngredient(0, 2);
+        prepareBurgerWithThreeIngredientsAndMoveFirstToLast();
         assertSame(hotSauceIngredient, burger.ingredients.get(2));
     }
 
@@ -195,12 +183,12 @@ public class BurgerTest {
         assertEquals(TOTAL_BURGER_PRICE, price, DELTA);
     }
 
+
     /**
-     * Проверяет, что при расчете цены бургера вызываются методы getPrice()
-     * у булки и каждого ингредиента.
+     * Проверяет, что при расчете цены бургера вызывается метод getPrice() у булки
      */
     @Test
-    public void getPriceShouldCallGetPriceMethods() {
+    public void getPriceShouldCallBunGetPrice() {
         setupSauceIngredient();
         setupFillingIngredient();
         createBurgerWithBunAndTwoIngredients();
@@ -208,10 +196,35 @@ public class BurgerTest {
         burger.getPrice();
 
         verify(bun).getPrice();
-        verify(hotSauceIngredient).getPrice();
-        verify(cutletFillingIngredient).getPrice();
     }
 
+    /**
+     * Проверяет, что при расчете цены бургера вызывается метод getPrice() у первого ингредиента
+     */
+    @Test
+    public void getPriceShouldCallFirstIngredientGetPrice() {
+        setupSauceIngredient();
+        setupFillingIngredient();
+        createBurgerWithBunAndTwoIngredients();
+
+        burger.getPrice();
+
+        verify(hotSauceIngredient).getPrice();
+    }
+
+    /**
+     * Проверяет, что при расчете цены бургера вызывается метод getPrice() у второго ингредиента
+     */
+    @Test
+    public void getPriceShouldCallSecondIngredientGetPrice() {
+        setupSauceIngredient();
+        setupFillingIngredient();
+        createBurgerWithBunAndTwoIngredients();
+
+        burger.getPrice();
+
+        verify(cutletFillingIngredient).getPrice();
+    }
 
     /**
      * Тестирует формирование чека для бургера без ингредиентов.
@@ -237,7 +250,6 @@ public class BurgerTest {
     public void getReceiptShouldCallGetNameForBunWithoutIngredients() {
         when(bun.getName()).thenReturn("white bun");
         burger.setBuns(bun);
-
         burger.getReceipt();
 
         verify(bun, times(2)).getName(); // Два раза: для верхней и нижней булки
@@ -264,23 +276,54 @@ public class BurgerTest {
     }
 
     /**
-     * Проверяет вызов методов getName() у булки и ингредиентов при формировании чека.
+     * Проверяет вызов методов getName() у булки при формировании чека
      */
     @Test
-    public void getReceiptShouldCallGetNameMethodsWithIngredients() {
-        setupSauceIngredient();
-        setupFillingIngredient();
-        createBurgerWithBunAndTwoIngredients();
+    public void getReceiptShouldCallBunGetName() {
+        prepareBurgerAndGenerateReceipt();
 
-        burger.getReceipt();
-
-        verify(bun, times(2)).getName(); // Два раза: для верхней и нижней булки
-        verify(hotSauceIngredient).getType();
-        verify(hotSauceIngredient).getName();
-        verify(cutletFillingIngredient).getType();
-        verify(cutletFillingIngredient).getName();
+        verify(bun, times(2)).getName();
     }
 
+    /**
+     * Проверяет вызов методов getType() у первого ингредиента при формировании чека
+     */
+    @Test
+    public void getReceiptShouldCallFirstIngredientGetType() {
+        prepareBurgerAndGenerateReceipt();
+
+        verify(hotSauceIngredient).getType();
+    }
+
+    /**
+     * Проверяет вызов методов getName() у первого ингредиента при формировании чека
+     */
+    @Test
+    public void getReceiptShouldCallFirstIngredientGetName() {
+        prepareBurgerAndGenerateReceipt();
+
+        verify(hotSauceIngredient).getName();
+    }
+
+    /**
+     * Проверяет вызов методов getType() у второго ингредиента при формировании чека
+     */
+    @Test
+    public void getReceiptShouldCallSecondIngredientGetType() {
+        prepareBurgerAndGenerateReceipt();
+
+        verify(cutletFillingIngredient).getType();
+    }
+
+    /**
+     * Проверяет вызов методов getName() у второго ингредиента при формировании чека
+     */
+    @Test
+    public void getReceiptShouldCallSecondIngredientGetName() {
+        prepareBurgerAndGenerateReceipt();
+
+        verify(cutletFillingIngredient).getName();
+    }
 
     /**
      * Тестирует генерацию исключения при попытке удаления с неверным индексом.
@@ -315,19 +358,6 @@ public class BurgerTest {
     }
 
     /**
-     * Тестирует вызов метода получения цены булки.
-     * Проверяет, что метод getPrice() вызывается у булки.
-     */
-    @Test
-    public void getPriceShouldCallBunGetPrice() {
-        burger.setBuns(bun);
-
-        burger.getPrice();
-
-        verify(bun).getPrice();
-    }
-
-    /**
      * Настраивает мок ингредиента с начинкой.
      */
     private void setupFillingIngredient() {
@@ -352,5 +382,27 @@ public class BurgerTest {
         when(hotSauceIngredient.getType()).thenReturn(IngredientType.SAUCE);
         when(hotSauceIngredient.getName()).thenReturn("hot sauce");
         when(hotSauceIngredient.getPrice()).thenReturn(HOT_SAUCE_PRICE);
+    }
+
+    /**
+     * Подготавливает бургер с тремя ингредиентами и перемещает первый ингредиент в конец.
+     * Вспомогательный метод для тестов перемещения ингредиентов.
+     */
+    private void prepareBurgerWithThreeIngredientsAndMoveFirstToLast() {
+        burger.addIngredient(hotSauceIngredient);
+        burger.addIngredient(cutletFillingIngredient);
+        burger.addIngredient(chiliSauceIngredient);
+        burger.moveIngredient(0, 2);
+    }
+
+    /**
+     * Подготавливает бургер с булкой и двумя ингредиентами и генерирует чек.
+     * Вспомогательный метод для тестов формирования чека.
+     */
+    private void prepareBurgerAndGenerateReceipt() {
+        setupSauceIngredient();
+        setupFillingIngredient();
+        createBurgerWithBunAndTwoIngredients();
+        burger.getReceipt();
     }
 }
